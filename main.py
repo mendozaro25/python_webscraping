@@ -97,9 +97,10 @@ def scrape_ebay_with_selenium(product):
 
 # Scraping en Amazon
 def scrape_amazon_with_selenium(product):
+    driver = WebDriverSingleton.get_instance()
+    driver.maximize_window()  # Maximizar la ventana para asegurar la visibilidad de todos los elementos
     url = f"https://www.amazon.com/s?k={product}"
     print(Fore.GREEN + f"Scraping de Amazon para: {product}..." + Style.RESET_ALL)
-    driver = WebDriverSingleton.get_instance()
     driver.get(url)
 
     try:
@@ -111,7 +112,11 @@ def scrape_amazon_with_selenium(product):
         return []
 
     containers = driver.find_elements(By.CSS_SELECTOR, ".s-main-slot .s-result-item")
-    results = [info for c in containers if (info := extract_product_info(c, "Amazon"))]
+    results = []
+    for c in containers:
+        info = extract_product_info(c, "Amazon")
+        if info:
+            results.append(info)
     print(Fore.CYAN + f"Amazon: {len(results)} productos encontrados\n" + Style.RESET_ALL)
     return results
 
